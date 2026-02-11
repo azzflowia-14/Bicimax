@@ -75,7 +75,7 @@ export default async function HomePage() {
                 </Button>
               </Link>
               <Link href="/productos?categoria=bicicletas">
-                <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
+                <Button size="lg" variant="outline" className="text-white border-white bg-transparent hover:bg-white/10">
                   Bicicletas
                 </Button>
               </Link>

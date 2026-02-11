@@ -68,7 +68,7 @@ export function Navbar({ categorias }: NavbarProps) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-72">
-              <nav className="flex flex-col gap-4 mt-8">
+              <nav className="flex flex-col gap-4 mt-8 px-4">
                 <Link
                   href="/"
                   className="text-lg font-semibold"
