@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { Bike } from "lucide-react"
+import Image from "next/image"
+import { MapPin, Phone, Instagram } from "lucide-react"
 
 export function Footer() {
   return (
@@ -9,14 +10,20 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Bike className="h-6 w-6 text-blue-400" />
+              <Image
+                src="/images/logoBicimax.png"
+                alt="Bicimax"
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain"
+              />
               <span className="text-lg font-bold text-white">
                 Bici<span className="text-blue-400">max</span>
               </span>
             </div>
             <p className="text-sm">
-              Tu tienda de bicicletas y accesorios. Todo lo que necesitas para
-              rodar.
+              Venta de bicicletas - Variedad de marcas, talles y modelos.
+              Envios a todo el pais.
             </p>
           </div>
 
@@ -44,10 +51,23 @@ export function Footer() {
           {/* Contact */}
           <div>
             <h3 className="text-white font-semibold mb-3">Contacto</h3>
-            <ul className="space-y-2 text-sm">
-              <li>contacto@bicimax.com</li>
-              <li>+54 11 1234-5678</li>
-              <li>Buenos Aires, Argentina</li>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-blue-400 shrink-0" />
+                Av. Mitre 260 - Ramallo
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-blue-400 shrink-0" />
+                <a href="https://wa.me/543407400287" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  3407400287
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Instagram className="h-4 w-4 text-blue-400 shrink-0" />
+                <a href="https://instagram.com/bicimax2021" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  @bicimax2021
+                </a>
+              </li>
             </ul>
           </div>
         </div>

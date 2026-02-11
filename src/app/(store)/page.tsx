@@ -52,12 +52,12 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 py-20 md:py-28">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Tu proxima aventura
-              <span className="text-blue-400"> empieza aca</span>
+              Bici<span className="text-blue-400">max</span>
+              <span className="block text-2xl md:text-3xl font-medium mt-2 text-slate-300">Bike Shop - Ramallo</span>
             </h1>
             <p className="text-lg text-slate-300 mb-8">
-              Encontra las mejores bicicletas, cascos, guantes y todo lo que
-              necesitas para rodar. Envios a todo el pais.
+              Variedad de marcas, talles y modelos. Todas las tarjetas.
+              Envios a todo el pais.
             </p>
             <div className="flex gap-3">
               <Link href="/productos">

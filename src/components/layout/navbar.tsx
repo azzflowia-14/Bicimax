@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Image from "next/image"
 import {
   ShoppingCart,
   User,
@@ -22,7 +23,6 @@ import {
   Heart,
   Package,
   LogOut,
-  Bike,
 } from "lucide-react"
 import { useCartStore } from "@/lib/cart-store"
 import { useSession, signOut } from "next-auth/react"
@@ -55,7 +55,7 @@ export function Navbar({ categorias }: NavbarProps) {
     <header className="sticky top-0 z-50 w-full border-b bg-white">
       {/* Top bar */}
       <div className="bg-slate-800 text-white text-xs py-1.5 text-center">
-        Envios a todo el pais | Pagos con Mercado Pago
+        Envios a todo el pais | Av. Mitre 260, Ramallo | WhatsApp: 3407400287
       </div>
 
       <div className="container mx-auto px-4">
@@ -101,11 +101,15 @@ export function Navbar({ categorias }: NavbarProps) {
           </Sheet>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <Bike className="h-7 w-7 text-blue-600" />
-            <span className="text-xl font-bold text-slate-800">
-              Bici<span className="text-blue-600">max</span>
-            </span>
+          <Link href="/" className="shrink-0">
+            <Image
+              src="/images/logoBicimax.png"
+              alt="Bicimax - Bike Shop Ramallo"
+              width={50}
+              height={50}
+              className="h-12 w-12 object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop nav */}
