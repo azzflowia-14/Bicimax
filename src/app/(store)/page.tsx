@@ -50,14 +50,14 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
-        <div className="container mx-auto px-4 py-10 md:py-14">
-          <div className="flex flex-col items-center text-center gap-1">
+        <div className="container mx-auto px-4 py-4 md:py-6">
+          <div className="flex flex-col items-center text-center">
             <Image
               src="/images/logoBicimax.png"
               alt="Bicimax - Bike Shop Ramallo"
               width={360}
               height={360}
-              className="h-64 w-64 md:h-80 md:w-80 object-contain"
+              className="h-64 w-64 md:h-80 md:w-80 object-contain -mb-4"
               priority
             />
             <h1 className="text-3xl md:text-4xl font-black tracking-tight font-[family-name:var(--font-montserrat)] uppercase">
