@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic"
 
 import Link from "next/link"
+import Image from "next/image"
 import { connectDB } from "@/lib/mongodb"
 import { Product } from "@/models/Product"
 import { Category } from "@/models/Category"
@@ -49,13 +50,21 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
-        <div className="container mx-auto px-4 py-20 md:py-28">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Bici<span className="text-blue-400">max</span>
-              <span className="block text-2xl md:text-3xl font-medium mt-2 text-slate-300">Bike Shop - Ramallo</span>
+        <div className="container mx-auto px-4 py-16 md:py-24">
+          <div className="flex flex-col items-center text-center">
+            <Image
+              src="/images/logoBicimax.png"
+              alt="Bicimax - Bike Shop Ramallo"
+              width={250}
+              height={250}
+              className="h-48 w-48 md:h-60 md:w-60 object-contain mb-6"
+              priority
+            />
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-2 font-[family-name:var(--font-montserrat)] uppercase">
+              BICI<span className="text-blue-400">MAX</span>
             </h1>
-            <p className="text-lg text-slate-300 mb-8">
+            <p className="text-lg text-slate-300 mb-1">Bike Shop - Ramallo</p>
+            <p className="text-base text-slate-400 mb-8 max-w-md">
               Variedad de marcas, talles y modelos. Todas las tarjetas.
               Envios a todo el pais.
             </p>

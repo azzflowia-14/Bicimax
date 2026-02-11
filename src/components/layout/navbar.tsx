@@ -101,15 +101,18 @@ export function Navbar({ categorias }: NavbarProps) {
           </Sheet>
 
           {/* Logo */}
-          <Link href="/" className="shrink-0">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
               src="/images/logoBicimax.png"
               alt="Bicimax - Bike Shop Ramallo"
-              width={50}
-              height={50}
-              className="h-12 w-12 object-contain"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-contain"
               priority
             />
+            <span className="text-xl font-black tracking-tight text-slate-800 uppercase font-[family-name:var(--font-montserrat)]">
+              BICI<span className="text-blue-600">MAX</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}
