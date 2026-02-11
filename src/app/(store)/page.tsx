@@ -50,25 +50,25 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="flex flex-col items-center text-center">
+        <div className="container mx-auto px-4 py-10 md:py-14">
+          <div className="flex flex-col items-center text-center gap-1">
             <Image
               src="/images/logoBicimax.png"
               alt="Bicimax - Bike Shop Ramallo"
-              width={250}
-              height={250}
-              className="h-48 w-48 md:h-60 md:w-60 object-contain mb-6"
+              width={360}
+              height={360}
+              className="h-64 w-64 md:h-80 md:w-80 object-contain"
               priority
             />
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-2 font-[family-name:var(--font-montserrat)] uppercase">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight font-[family-name:var(--font-montserrat)] uppercase">
               BICI<span className="text-blue-400">MAX</span>
             </h1>
-            <p className="text-lg text-slate-300 mb-1">Bike Shop - Ramallo</p>
-            <p className="text-base text-slate-400 mb-8 max-w-md">
+            <p className="text-base text-slate-300">Bike Shop - Ramallo</p>
+            <p className="text-sm text-slate-400 max-w-md mt-1">
               Variedad de marcas, talles y modelos. Todas las tarjetas.
               Envios a todo el pais.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 mt-4">
               <Link href="/productos">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
                   Ver productos
