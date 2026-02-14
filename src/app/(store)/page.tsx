@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ProductCard } from "@/components/store/product-card"
 import { Bike, Truck, Shield, CreditCard } from "lucide-react"
+import { BikeCalculator } from "@/components/store/bike-calculator"
 
 async function getDestacados() {
   await connectDB()
@@ -138,6 +139,21 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Calculadora de rodado */}
+      <section className="bg-slate-100 py-12">
+        <div className="container mx-auto px-4">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold font-[family-name:var(--font-montserrat)]">
+              ¿Qué rodado necesitás?
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Seleccioná el tipo de bici e ingresá tu altura para conocer el rodado ideal.
+            </p>
+          </div>
+          <BikeCalculator />
+        </div>
+      </section>
 
       {/* Featured products */}
       <section className="bg-slate-50 py-12">
