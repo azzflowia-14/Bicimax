@@ -26,7 +26,16 @@ export async function POST(request: Request) {
     const data = await request.json()
     await connectDB()
 
-    const slug = slugify(data.nombre)
+    // Generar slug único
+    let slug = slugify(data.nombre)
+    let existing = await Product.findOne({ slug })
+    let counter = 2
+    while (existing) {
+      slug = `${slugify(data.nombre)}-${counter}`
+      existing = await Product.findOne({ slug })
+      counter++
+    }
+
     const product = await Product.create({ ...data, slug })
 
     return NextResponse.json({ _id: product._id.toString() })
@@ -47,7 +56,15 @@ export async function PUT(request: Request) {
     await connectDB()
 
     if (updateData.nombre) {
-      updateData.slug = slugify(updateData.nombre)
+      let slug = slugify(updateData.nombre)
+      let existing = await Product.findOne({ slug, _id: { $ne: _id } })
+      let counter = 2
+      while (existing) {
+        slug = `${slugify(updateData.nombre)}-${counter}`
+        existing = await Product.findOne({ slug, _id: { $ne: _id } })
+        counter++
+      }
+      updateData.slug = slug
     }
 
     await Product.findByIdAndUpdate(_id, updateData)
