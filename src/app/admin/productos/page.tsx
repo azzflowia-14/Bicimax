@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useRef } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Pencil, Trash2, Loader2, Package } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Package, Upload, X, ImageIcon } from "lucide-react"
 import { formatPrice } from "@/lib/format"
 import { toast } from "sonner"
 
@@ -52,7 +51,6 @@ const emptyForm = {
   descripcion: "",
   precio: "",
   precioOferta: "",
-  imagenes: "",
   categoria: "",
   marca: "",
   stock: "",
@@ -68,7 +66,10 @@ export default function AdminProductosPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm)
+  const [imagenes, setImagenes] = useState<string[]>([])
+  const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     loadData()
@@ -88,6 +89,7 @@ export default function AdminProductosPage() {
   function openNew() {
     setEditId(null)
     setForm(emptyForm)
+    setImagenes([])
     setDialogOpen(true)
   }
 
@@ -98,7 +100,6 @@ export default function AdminProductosPage() {
       descripcion: p.descripcion,
       precio: String(p.precio),
       precioOferta: p.precioOferta ? String(p.precioOferta) : "",
-      imagenes: p.imagenes.join("\n"),
       categoria: p.categoria,
       marca: p.marca,
       stock: String(p.stock),
@@ -108,7 +109,49 @@ export default function AdminProductosPage() {
         .map(([k, v]) => `${k}: ${v}`)
         .join("\n"),
     })
+    setImagenes(p.imagenes || [])
     setDialogOpen(true)
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files?.length) return
+
+    setUploading(true)
+    const newUrls: string[] = []
+
+    for (const file of Array.from(files)) {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        })
+        if (res.ok) {
+          const data = await res.json()
+          newUrls.push(data.url)
+        } else {
+          const err = await res.json()
+          toast.error(`Error subiendo ${file.name}: ${err.error}`)
+        }
+      } catch {
+        toast.error(`Error subiendo ${file.name}`)
+      }
+    }
+
+    if (newUrls.length) {
+      setImagenes((prev) => [...prev, ...newUrls])
+      toast.success(`${newUrls.length} imagen(es) subida(s)`)
+    }
+    setUploading(false)
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
+
+  function removeImage(index: number) {
+    setImagenes((prev) => prev.filter((_, i) => i !== index))
   }
 
   async function handleSave() {
@@ -132,7 +175,7 @@ export default function AdminProductosPage() {
       descripcion: form.descripcion,
       precio: Number(form.precio),
       precioOferta: form.precioOferta ? Number(form.precioOferta) : undefined,
-      imagenes: form.imagenes.split("\n").map((s) => s.trim()).filter(Boolean),
+      imagenes,
       categoria: form.categoria,
       marca: form.marca,
       stock: Number(form.stock) || 0,
@@ -323,15 +366,54 @@ export default function AdminProductosPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Imagenes - Upload */}
             <div>
-              <Label>URLs de imagenes (una por linea)</Label>
-              <Textarea
-                value={form.imagenes}
-                onChange={(e) => setForm({ ...form, imagenes: e.target.value })}
-                rows={3}
-                placeholder="https://..."
-              />
+              <Label>Imagenes</Label>
+              <div className="mt-2 space-y-3">
+                {imagenes.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {imagenes.map((url, i) => (
+                      <div key={i} className="relative group aspect-square rounded overflow-hidden border">
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(i)}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div
+                  onClick={() => !uploading && fileInputRef.current?.click()}
+                  className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
+                >
+                  {uploading ? (
+                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Subiendo...
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
+                      <Upload className="h-5 w-5" />
+                      Click para subir imagenes
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleUpload}
+                />
+              </div>
             </div>
+
             <div>
               <Label>Especificaciones (clave: valor, una por linea)</Label>
               <Textarea
@@ -363,7 +445,7 @@ export default function AdminProductosPage() {
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={handleSave} disabled={saving || uploading} className="bg-blue-600 hover:bg-blue-700">
                 {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {editId ? "Guardar cambios" : "Crear producto"}
               </Button>
