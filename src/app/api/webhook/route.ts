@@ -25,27 +25,44 @@ export async function POST(request: Request) {
 
     await connectDB()
 
-    const order = await Order.findById(payment.external_reference)
-    if (!order) {
-      return NextResponse.json({ ok: true })
-    }
-
-    order.mpPaymentId = String(payment.id)
-
     if (payment.status === "approved") {
-      order.estado = "pagado"
+      // Atomic guard: only process if stockDeducted is not yet true
+      // This prevents double stock deduction on duplicate webhooks
+      const order = await Order.findOneAndUpdate(
+        {
+          _id: payment.external_reference,
+          stockDeducted: { $ne: true },
+        },
+        {
+          $set: {
+            estado: "pagado",
+            mpPaymentId: String(payment.id),
+            stockDeducted: true,
+          },
+        },
+        { new: false }
+      )
 
-      // Descontar stock
+      if (!order) {
+        // Order not found or already processed — both are safe to ignore
+        return NextResponse.json({ ok: true })
+      }
+
+      // Deduct stock (runs only once due to atomic guard)
       for (const item of order.items) {
         await Product.findByIdAndUpdate(item.productoId, {
           $inc: { stock: -item.cantidad },
         })
       }
-    } else if (payment.status === "rejected" || payment.status === "cancelled") {
-      order.estado = "cancelado"
+    } else if (
+      payment.status === "rejected" ||
+      payment.status === "cancelled"
+    ) {
+      await Order.findByIdAndUpdate(payment.external_reference, {
+        estado: "cancelado",
+        mpPaymentId: String(payment.id),
+      })
     }
-
-    await order.save()
 
     return NextResponse.json({ ok: true })
   } catch (error) {

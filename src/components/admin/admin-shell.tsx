@@ -10,14 +10,17 @@ import {
   FolderTree,
   ShoppingBag,
   BarChart3,
+  Truck,
   LogOut,
 } from "lucide-react"
 import { toast } from "sonner"
 
 const menu = [
+  { href: "/admin/dashboard", icon: BarChart3, label: "Dashboard" },
   { href: "/admin/productos", icon: Package, label: "Productos" },
   { href: "/admin/categorias", icon: FolderTree, label: "Categorias" },
   { href: "/admin/pedidos", icon: ShoppingBag, label: "Pedidos" },
+  { href: "/admin/proveedores", icon: Truck, label: "Proveedores" },
 ]
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

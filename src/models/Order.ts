@@ -6,6 +6,7 @@ export interface IOrderItem {
   precio: number
   cantidad: number
   imagen: string
+  costPriceAtPurchase: number
 }
 
 export interface IOrder {
@@ -27,6 +28,7 @@ export interface IOrder {
     telefono: string
   }
   notas?: string
+  stockDeducted: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -38,6 +40,7 @@ const OrderItemSchema = new Schema<IOrderItem>(
     precio: { type: Number, required: true },
     cantidad: { type: Number, required: true },
     imagen: { type: String, required: true },
+    costPriceAtPurchase: { type: Number, default: 0 },
   },
   { _id: false }
 )
@@ -65,8 +68,12 @@ const OrderSchema = new Schema<IOrder>(
       telefono: { type: String, required: true },
     },
     notas: { type: String },
+    stockDeducted: { type: Boolean, default: false },
   },
   { timestamps: true }
 )
+
+OrderSchema.index({ estado: 1, createdAt: -1 })
+OrderSchema.index({ mpPaymentId: 1 }, { sparse: true })
 
 export const Order = models.Order || model<IOrder>("Order", OrderSchema)

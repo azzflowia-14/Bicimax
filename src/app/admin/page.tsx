@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
     })
 
     if (res.ok) {
-      router.push("/admin/productos")
+      router.push("/admin/dashboard")
     } else {
       toast.error("Contraseña incorrecta")
     }

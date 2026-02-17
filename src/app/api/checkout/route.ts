@@ -53,6 +53,7 @@ export async function POST(request: Request) {
         precio,
         cantidad: item.cantidad,
         imagen: product.imagenes[0] || "",
+        costPriceAtPurchase: product.costPrice || 0,
       })
     }
 

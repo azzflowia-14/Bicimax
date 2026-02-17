@@ -38,12 +38,20 @@ interface Product {
   activo: boolean
   descripcion: string
   especificaciones: Record<string, string>
+  costPrice: number
+  sku?: string
+  supplierId?: string
 }
 
 interface Category {
   _id: string
   nombre: string
   slug: string
+}
+
+interface Supplier {
+  _id: string
+  nombre: string
 }
 
 const emptyForm = {
@@ -57,11 +65,15 @@ const emptyForm = {
   destacado: false,
   activo: true,
   especificaciones: "",
+  costPrice: "",
+  sku: "",
+  supplierId: "",
 }
 
 export default function AdminProductosPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
@@ -77,12 +89,14 @@ export default function AdminProductosPage() {
 
   async function loadData() {
     setLoading(true)
-    const [prods, cats] = await Promise.all([
+    const [prods, cats, sups] = await Promise.all([
       fetch("/api/products").then((r) => r.json()),
       fetch("/api/categories").then((r) => r.json()),
+      fetch("/api/suppliers").then((r) => r.json()),
     ])
     setProducts(prods)
     setCategories(cats)
+    setSuppliers(Array.isArray(sups) ? sups : [])
     setLoading(false)
   }
 
@@ -108,6 +122,9 @@ export default function AdminProductosPage() {
       especificaciones: Object.entries(p.especificaciones || {})
         .map(([k, v]) => `${k}: ${v}`)
         .join("\n"),
+      costPrice: p.costPrice ? String(p.costPrice) : "",
+      sku: p.sku || "",
+      supplierId: p.supplierId || "",
     })
     setImagenes(p.imagenes || [])
     setDialogOpen(true)
@@ -170,6 +187,13 @@ export default function AdminProductosPage() {
       })
     }
 
+    const costPrice = Number(form.costPrice) || 0
+    if (costPrice < 0) {
+      toast.error("El costo no puede ser negativo")
+      setSaving(false)
+      return
+    }
+
     const data = {
       nombre: form.nombre,
       descripcion: form.descripcion,
@@ -182,6 +206,9 @@ export default function AdminProductosPage() {
       destacado: form.destacado,
       activo: form.activo,
       especificaciones: specs,
+      costPrice,
+      sku: form.sku || undefined,
+      supplierId: form.supplierId && form.supplierId !== "none" ? form.supplierId : undefined,
     }
 
     const res = await fetch("/api/products", {
@@ -263,7 +290,19 @@ export default function AdminProductosPage() {
                       <p className="text-sm text-muted-foreground">
                         {p.marca} | Stock: {p.stock} |{" "}
                         {categories.find((c) => c._id === p.categoria)?.nombre || "Sin categoria"}
+                        {p.sku ? ` | SKU: ${p.sku}` : ""}
                       </p>
+                      {p.costPrice > 0 && (
+                        <p className="text-xs text-muted-foreground">
+                          Costo: {formatPrice(p.costPrice)} | Margen:{" "}
+                          {Math.round(
+                            (((p.precioOferta ?? p.precio) - p.costPrice) /
+                              (p.precioOferta ?? p.precio)) *
+                              100
+                          )}
+                          %
+                        </p>
+                      )}
                     </div>
                     <div className="text-right shrink-0">
                       <p className="font-bold">{formatPrice(p.precioOferta ?? p.precio)}</p>
@@ -349,6 +388,43 @@ export default function AdminProductosPage() {
                   value={form.stock}
                   onChange={(e) => setForm({ ...form, stock: e.target.value })}
                 />
+              </div>
+            </div>
+            {/* Costos y proveedor */}
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label>Costo (precio de compra)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={form.costPrice}
+                  onChange={(e) => setForm({ ...form, costPrice: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <Label>SKU</Label>
+                <Input
+                  value={form.sku}
+                  onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                  placeholder="Codigo interno"
+                />
+              </div>
+              <div>
+                <Label>Proveedor</Label>
+                <Select value={form.supplierId} onValueChange={(v) => setForm({ ...form, supplierId: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sin proveedor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sin proveedor</SelectItem>
+                    {suppliers.map((s) => (
+                      <SelectItem key={s._id} value={s._id}>
+                        {s.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div>

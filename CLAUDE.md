@@ -36,9 +36,11 @@ npm run lint         # ESLint
   - `/cuenta/favoritos` — Productos favoritos
 - `src/app/(auth)/` — Auth (login, registro)
 - `src/app/admin/` — Panel admin (login con contraseña en env)
-  - `/admin/productos` — CRUD de productos
+  - `/admin/dashboard` — Dashboard con KPIs, ventas diarias, top productos, stock valorizado
+  - `/admin/productos` — CRUD de productos (con costPrice, sku, proveedor)
   - `/admin/categorias` — CRUD de categorías
   - `/admin/pedidos` — Gestión de pedidos (cambiar estado)
+  - `/admin/proveedores` — CRUD de proveedores
 
 ### API Routes
 - `/api/auth/[...nextauth]` — NextAuth handlers
@@ -49,12 +51,17 @@ npm run lint         # ESLint
 - `/api/checkout` — Crear orden + preferencia MercadoPago
 - `/api/webhook` — Webhook de MercadoPago (actualiza estado de orden y stock)
 - `/api/admin/auth` — Login/logout admin (cookie)
+- `/api/admin/dashboard` — KPIs y métricas de ventas (aggregation pipelines)
+- `/api/admin/stock-report` — Stock valorizado (a precio venta y costo)
+- `/api/admin/export/products` — Exportar productos como CSV
+- `/api/suppliers` — CRUD proveedores (admin)
 
 ### Modelos (Mongoose)
 - `User` — nombre, email, password, provider, favoritos, dirección
-- `Product` — nombre, slug, precio, precioOferta, imágenes, categoría, marca, stock, especificaciones
+- `Product` — nombre, slug, precio, precioOferta, imágenes, categoría, marca, stock, especificaciones, costPrice, sku, supplierId
 - `Category` — nombre, slug, imagen, activa, orden
-- `Order` — userId, items, total, estado, mpPaymentId, direcciónEnvío
+- `Order` — userId, items (con costPriceAtPurchase), total, estado, mpPaymentId, direcciónEnvío, stockDeducted
+- `Supplier` — nombre, contacto, telefono, email, direccion, notas, cuit, condicionesPago, activo
 
 ### Auth
 - Clientes: NextAuth v5 con credentials + Google

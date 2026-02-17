@@ -14,6 +14,9 @@ export interface IProduct {
   destacado: boolean
   activo: boolean
   especificaciones: Record<string, string>
+  costPrice: number
+  sku?: string
+  supplierId?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -32,6 +35,9 @@ const ProductSchema = new Schema<IProduct>(
     destacado: { type: Boolean, default: false },
     activo: { type: Boolean, default: true },
     especificaciones: { type: Schema.Types.Mixed, default: {} },
+    costPrice: { type: Number, default: 0 },
+    sku: { type: String },
+    supplierId: { type: String, ref: "Supplier" },
   },
   { timestamps: true }
 )
@@ -41,5 +47,7 @@ ProductSchema.index({ categoria: 1 })
 ProductSchema.index({ slug: 1 })
 ProductSchema.index({ precio: 1 })
 ProductSchema.index({ destacado: 1, activo: 1 })
+ProductSchema.index({ sku: 1 }, { sparse: true })
+ProductSchema.index({ supplierId: 1 })
 
 export const Product = models.Product || model<IProduct>("Product", ProductSchema)
