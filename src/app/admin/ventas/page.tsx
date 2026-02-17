@@ -32,6 +32,7 @@ import {
   Eye,
   XCircle,
   X,
+  Download,
 } from "lucide-react"
 import { toast } from "sonner"
 import { formatPrice, formatDateTime } from "@/lib/format"
@@ -80,6 +81,13 @@ export default function AdminVentasPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [filtroEstado, setFiltroEstado] = useState("todos")
+  const [exportFrom, setExportFrom] = useState(() => {
+    const now = new Date()
+    const y = now.getFullYear()
+    const m = String(now.getMonth() + 1).padStart(2, "0")
+    return `${y}-${m}-01`
+  })
+  const [exportTo, setExportTo] = useState(() => new Date().toISOString().slice(0, 10))
 
   // Nueva Venta dialog
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -337,11 +345,49 @@ export default function AdminVentasPage() {
               {filtered.length} venta{filtered.length !== 1 ? "s" : ""}
             </p>
           </div>
-          <Button onClick={openNuevaVenta} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Nueva Venta
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={openNuevaVenta} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Nueva Venta
+            </Button>
+          </div>
         </div>
+
+        {/* Export bar */}
+        <Card>
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground shrink-0">Exportar:</span>
+              <Input
+                type="date"
+                value={exportFrom}
+                onChange={(e) => setExportFrom(e.target.value)}
+                className="w-36"
+              />
+              <span className="text-sm text-muted-foreground">a</span>
+              <Input
+                type="date"
+                value={exportTo}
+                onChange={(e) => setExportTo(e.target.value)}
+                className="w-36"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  window.open(
+                    `/api/admin/export/ventas?from=${exportFrom}&to=${exportTo}`,
+                    "_blank"
+                  )
+                }
+                className="gap-1"
+              >
+                <Download className="h-4 w-4" />
+                Excel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Filters */}
         <div className="flex gap-3">
