@@ -15,6 +15,7 @@ import {
   BarChart3,
   Download,
   Warehouse,
+  Store,
 } from "lucide-react"
 import { formatPrice } from "@/lib/format"
 
@@ -25,6 +26,9 @@ interface Kpis {
   ticketPromedio: number
   margenPromedio: number
   pedidosPendientes: number
+  ventasMostradorPendientes: number
+  cantidadOnline: number
+  cantidadMostrador: number
 }
 
 interface VentaDiaria {
@@ -217,21 +221,32 @@ export default function AdminDashboardPage() {
           <>
             {/* KPIs */}
             {kpis && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <KpiCard
-                  title="Ventas"
+                  title="Ventas totales"
                   value={formatPrice(kpis.totalVentas)}
                   icon={DollarSign}
                   color="text-green-600"
                 />
                 <KpiCard
-                  title="Pedidos"
-                  value={String(kpis.cantidadPedidos)}
+                  title="Online"
+                  value={String(kpis.cantidadOnline)}
                   icon={ShoppingCart}
                   color="text-blue-600"
                   sub={
                     kpis.pedidosPendientes > 0
                       ? `${kpis.pedidosPendientes} pendiente${kpis.pedidosPendientes > 1 ? "s" : ""}`
+                      : undefined
+                  }
+                />
+                <KpiCard
+                  title="Mostrador"
+                  value={String(kpis.cantidadMostrador)}
+                  icon={Store}
+                  color="text-indigo-600"
+                  sub={
+                    kpis.ventasMostradorPendientes > 0
+                      ? `${kpis.ventasMostradorPendientes} pendiente${kpis.ventasMostradorPendientes > 1 ? "s" : ""} de cobro`
                       : undefined
                   }
                 />
