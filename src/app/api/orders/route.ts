@@ -20,6 +20,21 @@ export async function GET() {
   )
 }
 
+export async function DELETE() {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+  }
+
+  try {
+    await connectDB()
+    const result = await Order.deleteMany({})
+    return NextResponse.json({ success: true, deleted: result.deletedCount })
+  } catch (error) {
+    console.error("Error eliminando pedidos:", error)
+    return NextResponse.json({ error: "Error al eliminar" }, { status: 500 })
+  }
+}
+
 export async function PUT(request: Request) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })

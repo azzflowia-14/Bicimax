@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Loader2, ShoppingBag } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Loader2, ShoppingBag, Trash2 } from "lucide-react"
 import { formatPrice, formatDateTime } from "@/lib/format"
 import { toast } from "sonner"
 
@@ -80,9 +81,31 @@ export default function AdminPedidosPage() {
   return (
     <AdminShell>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Pedidos</h1>
-          <p className="text-muted-foreground">{orders.length} pedidos</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Pedidos</h1>
+            <p className="text-muted-foreground">{orders.length} pedidos</p>
+          </div>
+          {orders.length > 0 && (
+            <Button
+              variant="outline"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={async () => {
+                if (!confirm("ATENCION: Esto eliminara TODOS los pedidos. Continuar?")) return
+                const res = await fetch("/api/orders", { method: "DELETE" })
+                if (res.ok) {
+                  const data = await res.json()
+                  toast.success(`${data.deleted} pedido(s) eliminados`)
+                  loadData()
+                } else {
+                  toast.error("Error al eliminar pedidos")
+                }
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Vaciar pedidos
+            </Button>
+          )}
         </div>
 
         {loading ? (
