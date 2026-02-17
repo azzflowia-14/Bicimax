@@ -5,12 +5,17 @@ import { connectDB } from "@/lib/mongodb"
 import { Order } from "@/models/Order"
 import { Product } from "@/models/Product"
 
-const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
-})
-
 export async function POST(request: Request) {
   try {
+    const accessToken = (process.env.MP_ACCESS_TOKEN || "").trim()
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: "MercadoPago no configurado (MP_ACCESS_TOKEN faltante)" },
+        { status: 500 }
+      )
+    }
+    const mpClient = new MercadoPagoConfig({ accessToken })
+
     const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 })

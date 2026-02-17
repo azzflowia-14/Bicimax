@@ -4,10 +4,6 @@ import { connectDB } from "@/lib/mongodb"
 import { Order } from "@/models/Order"
 import { Product } from "@/models/Product"
 
-const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
-})
-
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -16,6 +12,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true })
     }
 
+    const mpClient = new MercadoPagoConfig({
+      accessToken: (process.env.MP_ACCESS_TOKEN || "").trim(),
+    })
     const paymentApi = new Payment(mpClient)
     const payment = await paymentApi.get({ id: body.data.id })
 

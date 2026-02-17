@@ -89,7 +89,7 @@ export default function CheckoutPage() {
 
       const data = await res.json()
       if (data.error) {
-        toast.error(data.error)
+        toast.error(data.details ? `${data.error}: ${data.details}` : data.error)
         return
       }
 
