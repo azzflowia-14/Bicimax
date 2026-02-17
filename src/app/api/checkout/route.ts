@@ -70,27 +70,33 @@ export async function POST(request: Request) {
 
     // Create MercadoPago preference
     const preference = new Preference(mpClient)
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").trim()
+
+    const preferenceBody: Record<string, unknown> = {
+      items: orderItems.map((item) => ({
+        id: item.productoId,
+        title: item.nombre,
+        quantity: item.cantidad,
+        unit_price: item.precio,
+        currency_id: "ARS",
+      })),
+      back_urls: {
+        success: `${baseUrl}/cuenta/pedidos?status=success`,
+        failure: `${baseUrl}/cuenta/pedidos?status=failure`,
+        pending: `${baseUrl}/cuenta/pedidos?status=pending`,
+      },
+      auto_return: "approved",
+      external_reference: order._id.toString(),
+    }
+
+    // Solo enviar notification_url si es una URL pública (MP rechaza localhost)
+    if (baseUrl.startsWith("https://")) {
+      preferenceBody.notification_url = `${baseUrl}/api/webhook`
+    }
 
     const result = await preference.create({
-      body: {
-        items: orderItems.map((item) => ({
-          id: item.productoId,
-          title: item.nombre,
-          quantity: item.cantidad,
-          unit_price: item.precio,
-          currency_id: "ARS",
-        })),
-        back_urls: {
-          success: `${baseUrl}/cuenta/pedidos?status=success`,
-          failure: `${baseUrl}/cuenta/pedidos?status=failure`,
-          pending: `${baseUrl}/cuenta/pedidos?status=pending`,
-        },
-        auto_return: "approved",
-        external_reference: order._id.toString(),
-        notification_url: `${baseUrl}/api/webhook`,
-      },
-    })
+      body: preferenceBody,
+    } as Parameters<typeof preference.create>[0])
 
     // Save preference ID
     order.mpPreferenceId = result.id
@@ -101,9 +107,10 @@ export async function POST(request: Request) {
       init_point: result.init_point,
     })
   } catch (error) {
-    console.error("Error en checkout:", error)
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error("Error en checkout:", msg, error)
     return NextResponse.json(
-      { error: "Error al procesar el pedido" },
+      { error: "Error al procesar el pedido", details: msg },
       { status: 500 }
     )
   }
