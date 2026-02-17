@@ -75,7 +75,20 @@ export async function POST(request: Request) {
 
     // Create MercadoPago preference
     const preference = new Preference(mpClient)
-    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").trim()
+
+    // Detectar URL base: usar NEXT_PUBLIC_APP_URL, o inferir del header en Vercel
+    let baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "").trim()
+    if (!baseUrl) {
+      // Fallback: usar VERCEL_URL si existe (auto-seteada por Vercel)
+      const vercelUrl = process.env.VERCEL_URL
+      if (vercelUrl) {
+        baseUrl = `https://${vercelUrl}`
+      } else {
+        baseUrl = "http://localhost:3000"
+      }
+    }
+
+    console.log("Checkout baseUrl:", baseUrl)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: any = {
@@ -86,17 +99,17 @@ export async function POST(request: Request) {
         unit_price: item.precio,
         currency_id: "ARS",
       })),
-      back_urls: {
-        success: `${baseUrl}/cuenta/pedidos?status=success`,
-        failure: `${baseUrl}/cuenta/pedidos?status=failure`,
-        pending: `${baseUrl}/cuenta/pedidos?status=pending`,
-      },
-      auto_return: "approved",
       external_reference: order._id.toString(),
     }
 
-    // Solo enviar notification_url si es una URL pública (MP rechaza localhost)
+    // MP requiere URLs publicas para back_urls y auto_return
     if (baseUrl.startsWith("https://")) {
+      body.back_urls = {
+        success: `${baseUrl}/cuenta/pedidos?status=success`,
+        failure: `${baseUrl}/cuenta/pedidos?status=failure`,
+        pending: `${baseUrl}/cuenta/pedidos?status=pending`,
+      }
+      body.auto_return = "approved"
       body.notification_url = `${baseUrl}/api/webhook`
     }
 
