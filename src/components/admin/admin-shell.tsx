@@ -11,6 +11,7 @@ import {
   ShoppingBag,
   BarChart3,
   Truck,
+  Store,
   LogOut,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -20,6 +21,7 @@ const menu = [
   { href: "/admin/productos", icon: Package, label: "Productos" },
   { href: "/admin/categorias", icon: FolderTree, label: "Categorias" },
   { href: "/admin/pedidos", icon: ShoppingBag, label: "Pedidos" },
+  { href: "/admin/ventas", icon: Store, label: "Ventas Mostrador" },
   { href: "/admin/proveedores", icon: Truck, label: "Proveedores" },
 ]
 
