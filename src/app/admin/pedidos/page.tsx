@@ -59,14 +59,21 @@ export default function AdminPedidosPage() {
   }
 
   async function updateEstado(orderId: string, estado: string) {
-    const res = await fetch("/api/orders", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _id: orderId, estado }),
-    })
-    if (res.ok) {
-      toast.success("Estado actualizado")
-      loadData()
+    try {
+      const res = await fetch("/api/orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ _id: orderId, estado }),
+      })
+      if (res.ok) {
+        toast.success("Estado actualizado")
+        loadData()
+      } else {
+        const err = await res.json()
+        toast.error(err.error || "Error al actualizar estado")
+      }
+    } catch {
+      toast.error("Error de conexion")
     }
   }
 
@@ -107,16 +114,20 @@ export default function AdminPedidosPage() {
                         value={order.estado}
                         onValueChange={(v) => updateEstado(order._id, v)}
                       >
-                        <SelectTrigger className="w-36">
-                          <Badge className={estadoColors[order.estado] || ""}>
-                            {order.estado}
-                          </Badge>
+                        <SelectTrigger className="w-40">
+                          <SelectValue>
+                            <Badge className={estadoColors[order.estado] || ""}>
+                              {order.estado}
+                            </Badge>
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {["pendiente", "pagado", "enviado", "entregado", "cancelado"].map(
                             (e) => (
                               <SelectItem key={e} value={e}>
-                                {e}
+                                <Badge className={`${estadoColors[e] || ""} text-xs`}>
+                                  {e}
+                                </Badge>
                               </SelectItem>
                             )
                           )}
