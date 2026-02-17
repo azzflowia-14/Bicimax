@@ -77,7 +77,8 @@ export async function POST(request: Request) {
     const preference = new Preference(mpClient)
     const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").trim()
 
-    const preferenceBody: Record<string, unknown> = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body: any = {
       items: orderItems.map((item) => ({
         id: item.productoId,
         title: item.nombre,
@@ -96,12 +97,10 @@ export async function POST(request: Request) {
 
     // Solo enviar notification_url si es una URL pública (MP rechaza localhost)
     if (baseUrl.startsWith("https://")) {
-      preferenceBody.notification_url = `${baseUrl}/api/webhook`
+      body.notification_url = `${baseUrl}/api/webhook`
     }
 
-    const result = await preference.create({
-      body: preferenceBody,
-    } as Parameters<typeof preference.create>[0])
+    const result = await preference.create({ body })
 
     // Save preference ID
     order.mpPreferenceId = result.id
