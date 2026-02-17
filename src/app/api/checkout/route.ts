@@ -111,9 +111,18 @@ export async function POST(request: Request) {
       orderId: order._id.toString(),
       init_point: result.init_point,
     })
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error)
-    console.error("Error en checkout:", msg, error)
+  } catch (error: unknown) {
+    let msg: string
+    if (error instanceof Error) {
+      msg = error.message
+    } else if (typeof error === "object" && error !== null) {
+      // MercadoPago SDK throws plain objects with cause/message/status
+      const e = error as Record<string, unknown>
+      msg = JSON.stringify(e.cause || e.message || e, null, 2)
+    } else {
+      msg = String(error)
+    }
+    console.error("Error en checkout:", msg)
     return NextResponse.json(
       { error: "Error al procesar el pedido", details: msg },
       { status: 500 }
